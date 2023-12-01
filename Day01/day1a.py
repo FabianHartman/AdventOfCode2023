@@ -1,6 +1,4 @@
-import json
-
-with open('./Day01/input.txt', 'r') as file:
+with open('./input.txt', 'r') as file:
     data = file.readlines();
 
 calibrationValues = []
