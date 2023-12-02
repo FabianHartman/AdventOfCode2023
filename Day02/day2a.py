@@ -55,7 +55,7 @@ class Game:
             if input_bit.isnumeric():
                 count = int(input_bit)
             else:
-                color = input_bit.replace(",","").replace(";","")
+                color = input_bit.replace(",","").replace(";","").replace("\n","")
                 shown_block_counts.append(BlockCount(count,color))
         return Game(shown_block_counts,game_id)
 
