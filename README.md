@@ -7,7 +7,7 @@ The repository is organized by day, and each day has its own directory containin
 
 ## Running the Solutions
 
-To run a specific puzzles solution, navigate to the corresponding directory (e.g., `cd Day01`) and execute the Python script: (e.g., `python day1a.py`)
+To run a specific puzzles solution, navigate to the corresponding directory (e.g., `cd Day01`) and execute the Python script: (e.g., `python day01a.py`)
 
 ## Puzzle descriptions
 Puzzle descriptions for every puzzle can be found on [the website of Advent of Code](https://adventofcode.com/2023).
