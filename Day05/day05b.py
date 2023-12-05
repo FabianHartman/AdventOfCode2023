@@ -22,6 +22,12 @@ class AlmanacMap:
                 return number + (alamancaMapPart.destination - alamancaMapPart.source)
         return number
 
+    def getReversedOutcome(self,number):
+        for alamancaMapPart in self.almanacMapParts:
+            if alamancaMapPart.destination<=number<=alamancaMapPart.destination+alamancaMapPart.range:
+                return number - (alamancaMapPart.destination - alamancaMapPart.source)
+        return number
+
 
 class AlmanacMapPart:
     def __init__(self,source,destination,range):
@@ -33,50 +39,69 @@ class AlmanacMapPart:
         return f"{self.destination} {self.source} {self.range}"
 
 class Seed:
-    def __init__(self,number):
-        self.number = int(number)
+    seeds = []
+    def __init__(self, number, seedrange):
+        self.start = int(number)
+        self.end = int(number) + int(seedrange)
+        Seed.seeds.append(self)
 
     def __str__(self):
-        return f"{self.number}"
+        return f"{self.start} till {self.end}"
 
-    def getLocation(self):
-        current_value = self.number
-        for alamancaMap in AlmanacMap.almanacMaps:
-            current_value = alamancaMap.getOutcome(current_value)
+    @staticmethod
+    def parseSeedValues(inputString):
+        seed_parts = inputString.split(" ")[1:]
+        start = -1
+        seeds = []
+        for seed_part in seed_parts:
+            if start == -1:
+                start = int(seed_part)
+                continue
+            seed_range = int(seed_part)
+            seeds.append(Seed(start,seed_range))
+            start = -1
+        return seeds
+
+    @staticmethod
+    def exists(number):
+        for seed in Seed.seeds:
+            if seed.start<=number<=seed.end:
+                return True
+        return False
+
+
+class Location:
+    def __init__(self,number):
+        self.number = number
+
+    def getOriginSeed(self):
+        return Location.getOriginSeedByNumber(self.number)
+
+    @staticmethod
+    def getOriginSeedByNumber(number):
+        current_value = number
+        for alamancaMap in reversed(AlmanacMap.almanacMaps):
+            current_value = alamancaMap.getReversedOutcome(current_value)
         return current_value
 
     @staticmethod
-    def parseSeeds(inputString):
-        input_seed_parts = inputString.split(" ")[1:]
-        seeds = []
-        source = -1
-        amount = -1
-        for number in input_seed_parts:
-            if source == -1:
-                source = int(number)
-                continue
-            amount = int(number)
-            for i in range(0,amount):
-                seeds.append(Seed(source+i))
-            source = -1
-            amount = -1
-        return seeds
+    def getFirstLocationWithSeed():
+        current_location = 0
+        while True:
+            current_location+=1
+            if Seed.exists(Location.getOriginSeedByNumber(current_location)):
+                break
+        return current_location
 
 
 
 
-input_seeds = []
+
 with open('./input.txt', 'r') as file:
     input_parts = file.read().split("\n\n")
-    # get the in input seeds
-    input_seeds = Seed.parseSeeds(input_parts[0])
-
+    Seed.parseSeedValues(input_parts[0])
     # get the maps
     for map in range(1,len(input_parts)):
         map_as_string = input_parts[map]
         alamancaMap = AlmanacMap.parseInputString(map_as_string)
-
-locations = []
-for input_seed in input_seeds:
-    locations.append(input_seed.getLocation())
-print(min(locations))
+print(Location.getFirstLocationWithSeed())
