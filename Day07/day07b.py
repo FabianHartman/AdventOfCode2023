@@ -22,8 +22,12 @@ class Hand:
         amount_of_jokers = card_counts.get('J', 0)
         if amount_of_jokers == n: return True
         for key in card_counts:
-            if card_counts[key] + amount_of_jokers==n:
-                return True
+            if key != "J":
+                if card_counts[key] + amount_of_jokers == n:
+                    return True
+            else:
+                if card_counts[key] == n:
+                    return True
         return False
 
     def hasFullHouse(self):
