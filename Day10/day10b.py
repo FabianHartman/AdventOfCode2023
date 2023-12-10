@@ -110,10 +110,8 @@ class Grid:
 
     def getAmountOfEnclosedCells(self):
         visited_coordinates = self.getTubeCoordinates()
-        up_tube_types = ["\033[92m"+"|"+"\033[0m","\033[92m"+"L"+"\033[0m","\033[92m"+"J"+"\033[0m"]
-        if self.canGoUpFromStart(): up_tube_types += ["\033[92m"+"S"+"\033[0m"]
-        for visited_coordinate in visited_coordinates:
-            self.rows[visited_coordinate.row_coordinate].cells[visited_coordinate.column_coordinate] = "\033[92m" + self.rows[visited_coordinate.row_coordinate].cells[visited_coordinate.column_coordinate] + "\033[0m"
+        up_tube_types = ["|","L","J"]
+        if self.canGoUpFromStart(): up_tube_types += ["S"]
         amount_of_enclosed_cells = 0
         for row_i in range(0,len(self.rows)):
             north_pipes = 0
@@ -125,9 +123,7 @@ class Grid:
                         north_pipes += 1
                     continue
                 if north_pipes % 2 == 1:
-                    self.rows[row_i].cells[cell_i] = "I"
                     amount_of_enclosed_cells += 1
-        print(self)
         return amount_of_enclosed_cells
 
     def __str__(self):
