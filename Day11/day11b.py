@@ -91,8 +91,7 @@ class Path:
             return self.startCoordinate in [other.startCoordinate, other.endCoordinate] and self.endCoordinate in [other.startCoordinate, other.endCoordinate]
         return NotImplemented
 
-    def calculateLength(self,image):
-        empty_multiplier = 100
+    def calculateLength(self,image,empty_multiplier):
         vertical_length = 0
         horizontal_length = 0
         column_step_size = 1
@@ -106,7 +105,7 @@ class Path:
                 vertical_length += empty_multiplier
             else:
                 vertical_length += 1
-        for row_i in range(self.startCoordinate.row_coordinate,self.endCoordinate.row_coordinate):
+        for row_i in range(self.startCoordinate.row_coordinate,self.endCoordinate.row_coordinate,row_step_size):
             if image.isRowEmpty(row_i):
                 horizontal_length += empty_multiplier
             else:
@@ -138,5 +137,5 @@ with open('./input.txt', 'r') as file:
     paths = Path.parsePathsFromGalaxyDictionary(galaxies)
     total = 0
     for path in paths:
-        total += path.calculateLength(image)
+        total += path.calculateLength(image,1000000)
 print(total)
