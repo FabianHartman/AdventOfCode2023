@@ -92,16 +92,17 @@ class Path:
         return NotImplemented
 
     def calculateLength(self,image):
+        empty_multiplier = 1000000
         vertical_length = 0
         horizontal_length = 0
         for column_i in range(self.startCoordinate.column_coordinate,self.endCoordinate.column_coordinate):
             if image.isColumnEmpty(column_i):
-                vertical_length += 1000000
+                vertical_length += empty_multiplier
             else:
                 vertical_length += 1
         for row_i in range(self.startCoordinate.row_coordinate,self.endCoordinate.row_coordinate):
             if image.isRowEmpty(row_i):
-                horizontal_length += 1000000
+                horizontal_length += empty_multiplier
             else:
                 horizontal_length += 1
 
