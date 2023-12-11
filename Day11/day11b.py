@@ -12,12 +12,12 @@ class Image:
         for column_i in range(len(rows[0].cells)):
             all_empty = True
             for row_i in range(len(rows)):
-                if rows[row_i].cells[column_i] != ".": all_empty = False
+                if "." not in rows[row_i].cells[column_i]: all_empty = False
             if all_empty: empty_columns.append(column_i)
         while len(empty_columns) > 0:
             column_i = empty_columns.pop()
             for row in rows:
-                row.cells[column_i] += "X"
+                row.cells[column_i] += "Y"
         return Image(rows)
 
     def __str__(self):
@@ -37,7 +37,7 @@ class Image:
         return galaxy_coordinates
 
     def isColumnEmpty(self,index):
-        return "Y" in self.rows[index].cells[0]
+        return "Y" in self.rows[0].cells[index]
 
     def isRowEmpty(self,index):
         return self.rows[index].isEmpty()
@@ -58,7 +58,7 @@ class Row:
             cells.append(inputCharacter)
         if all_empty:
             for cell_i in range(0,len(cells)):
-                cells[cell_i] += "Y"
+                cells[cell_i] += "X"
         return [Row(cells)]
 
     def __str__(self):
@@ -92,10 +92,16 @@ class Path:
         return NotImplemented
 
     def calculateLength(self,image):
-        empty_multiplier = 1000000
+        empty_multiplier = 100
         vertical_length = 0
         horizontal_length = 0
-        for column_i in range(self.startCoordinate.column_coordinate,self.endCoordinate.column_coordinate):
+        column_step_size = 1
+        if self.startCoordinate.column_coordinate > self.endCoordinate.column_coordinate:
+            column_step_size = -1
+        row_step_size = 1
+        if self.startCoordinate.row_coordinate > self.endCoordinate.row_coordinate:
+            column_step_size = -1
+        for column_i in range(self.startCoordinate.column_coordinate,self.endCoordinate.column_coordinate,column_step_size):
             if image.isColumnEmpty(column_i):
                 vertical_length += empty_multiplier
             else:
