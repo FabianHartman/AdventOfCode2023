@@ -11,12 +11,13 @@ class Row:
         rows = []
         for inputString in inputStrings:
             inputString_parts = inputString.split(" ")
-            pattern = "?".join([inputString_parts[0]] * 5)
-            counts = tuple(int(x) for x in inputString_parts[1].split(",")) * 5
-            rows.append(Row(pattern, counts))
+            records = "?".join([inputString_parts[0]] * 5)
+            amounts_of_broken = ",".join(5*[inputString_parts[1]])
+            rows.append(Row(records, amounts_of_broken))
         return rows
 
 
+# made a calculator instead of a method on an object to make caching easier
 class RowArrangementCalculator:
     def __init__(self, records):
         self.rows = records
@@ -34,13 +35,14 @@ class RowArrangementCalculator:
         if records[0] in ".?":
             result += self.calculate_arrangements(records[1:], amounts_of_broken)
 
+        amounts_of_broken_list = amounts_of_broken.split(",")
         if (
                 records[0] in "#?"
-                and amounts_of_broken[0] <= len(records)
-                and "." not in records[: amounts_of_broken[0]]
-                and (amounts_of_broken[0] == len(records) or records[amounts_of_broken[0]] != "#")
+                and int(amounts_of_broken_list[0] )<= len(records)
+                and "." not in records[: int(amounts_of_broken_list[0])]
+                and (int(amounts_of_broken_list[0]) == len(records) or records[int(amounts_of_broken_list[0])] != "#")
         ):
-            result += self.calculate_arrangements(records[amounts_of_broken[0] + 1:], amounts_of_broken[1:])
+            result += self.calculate_arrangements(records[int(amounts_of_broken_list[0]) + 1:], ",".join(amounts_of_broken_list[1:]))
 
         return result
 
