@@ -1,92 +1,72 @@
-class Edge:
-    def __init__(self,coordinate,angle):
-        self.coordinate = coordinate
-        self.angle = angle
-
 class Coordinate:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-    def __add__(self, other):
-        return Coordinate(self.x + other.x, self.y + other.y)
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-    def __str__(self):
-        return f"({self.x}, {self.y})"
+class Direction:
+    def __init__(self, dx, dy):
+        self.dx = dx
+        self.dy = dy
 
 class Instruction:
-    def __init__(self,direction,amountOfBlocks,color):
+    def __init__(self, direction, amount_of_blocks):
         self.direction = direction
-        self.amountOfBlocks = amountOfBlocks
-        self.color = color
+        self.amount_of_blocks = amount_of_blocks
 
     @staticmethod
-    def parseInstructionString(instructionString):
-        instructionStringParts = instructionString.split()
-        return Instruction(instructionStringParts[0],int(instructionStringParts[1]),instructionStringParts[2].replace(")","").replace("(",""))
-
-    def __str__(self):
-        return f"{self.direction} {self.amountOfBlocks} ({self.color})"
+    def parse_instruction_string(instruction_string):
+        instruction_parts = instruction_string.split()
+        direction_str, amount_str = instruction_parts[0], instruction_parts[1]
+        dx, dy = DigPlan.dirs[direction_str]
+        direction = Direction(dx, dy)
+        amount_of_blocks = int(amount_str)
+        return Instruction(direction, amount_of_blocks)
 
 class DigPlan:
-    def __init__(self,instructions):
+    dirs = {'R': (0, 1), 'L': (0, -1), 'U': (-1, 0), 'D': (1, 0)}
+
+    def __init__(self, data, instructions, borders):
+        self.data = data
         self.instructions = instructions
+        self.borders = borders
 
     @staticmethod
-    def parseInput(input):
+    def parseInput():
+        data = open("./input.txt", 'r').read().strip().split('\n')
         instructions = []
-        for inputLine in input.splitlines():
-            instructions.append(Instruction.parseInstructionString(inputLine))
-        return DigPlan(instructions)
+        borders = []
+        x, y = 0, 0
+        for row in data:
+            instruction = Instruction.parse_instruction_string(row)
+            instructions.append(instruction)
 
-    def __str__(self):
-        string = ""
-        for instruction in self.instructions:
-            string = string + str(instruction) + "\n"
-        return string[:-1]
+            dx, dy = instruction.direction.dx, instruction.direction.dy
+            for _ in range(instruction.amount_of_blocks):
+                borders.append(Coordinate(x, y))
+                x, y = x + dx, y + dy
+        return DigPlan(data,instructions,borders)
 
-    def getLagoonEdgeAndCorners(self):
-        edge_locations = [Coordinate(0,0)]
-        last_location = Coordinate(0,0)
-        for instruction in self.instructions:
-            for i in range(instruction.amountOfBlocks):
-                direction = instruction.direction
-                match direction:
-                    case "R": new_location = last_location.__add__(Coordinate(1,0))
-                    case "L": new_location = last_location.__add__(Coordinate(-1,0))
-                    case "U": new_location = last_location.__add__(Coordinate(0,1))
-                    case "D": new_location = last_location.__add__(Coordinate(0,-1))
+    def process_data(self):
+        x, y = 0, 0
+        for row in self.data:
+            instruction = Instruction.parse_instruction_string(row)
+            self.instructions.append(instruction)
 
+            dx, dy = instruction.direction.dx, instruction.direction.dy
+            for _ in range(instruction.amount_of_blocks):
+                self.borders.append(Coordinate(x, y))
+                x, y = x + dx, y + dy
 
-                if new_location not in edge_locations:
-                    edge_locations.append(new_location)
-                last_location = new_location
-        return edge_locations
+    def calculate_area(self):
+        area = 0
+        for i in range(len(self.borders) - 1):
+            x1, y1 = self.borders[i].x, self.borders[i].y
+            x2, y2 = self.borders[i + 1].x, self.borders[i + 1].y
+            area += x1 * y2 - x2 * y1
 
-    def calculateInnerLagoonSize(self):
-        edge_locations = self.getLagoonEdgeAndCorners()
+        edge_length = len(self.borders)
+        interior_area = abs(area) // 2 - edge_length // 2 + 1
+        return interior_area + edge_length
 
-        # Calculate the area of the convex hull (internal space of the lagoon) using the shoelace formula
-        area = 0.0
-        n = len(edge_locations)
-
-        for i in range(n):
-            j = (i + 1) % n
-            area += edge_locations[i].x * edge_locations[j].y
-            area -= edge_locations[j].x * edge_locations[i].y
-
-        area = abs(area) / 2.0
-
-        return area
-
-
-
-with open('./input.txt', 'r') as file:
-    digplan = DigPlan.parseInput(file.read())
-    print(digplan.calculateInnerLagoonSize())
+digplan = DigPlan.parseInput()
+print(digplan.calculate_area())
